@@ -1,0 +1,80 @@
+{% extends "dataprocessor/base.html" %}
+
+{% block title %}Файл жүктеу — Big Data{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-7">
+
+        <div class="card shadow-sm">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0">📁 Файл жүктеу</h5>
+            </div>
+            <div class="card-body">
+                <p class="text-muted">
+                    CSV, JSON, TXT немесе XLSX файлын жүктеңіз. Максимум өлшем: <strong>100 МБ</strong>.
+                </p>
+
+                <form method="post" enctype="multipart/form-data" id="upload-form">
+                    {% csrf_token %}
+
+                    <div class="mb-3">
+                        {{ form.file.label_tag }}
+                        {{ form.file }}
+                        {% if form.file.help_text %}
+                            <div class="form-text">{{ form.file.help_text }}</div>
+                        {% endif %}
+                        {% for error in form.file.errors %}
+                            <div class="text-danger small">{{ error }}</div>
+                        {% endfor %}
+                    </div>
+
+                    <!-- Прогресс жолағы (жүктеу кезінде) -->
+                    <div class="progress mb-3 d-none" id="upload-progress">
+                        <div class="progress-bar progress-bar-striped progress-bar-animated"
+                             style="width: 100%">Жүктелуде...</div>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary w-100" id="submit-btn">
+                        ⬆ Жүктеу
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Соңғы жүктелген файлдар -->
+        {% if recent_files %}
+        <div class="card shadow-sm mt-4">
+            <div class="card-header">🕐 Соңғы жүктелгендер</div>
+            <ul class="list-group list-group-flush">
+                {% for f in recent_files %}
+                <li class="list-group-item d-flex justify-content-between align-items-center">
+                    <span>
+                        <strong>{{ f.original_name }}</strong>
+                        <span class="badge bg-secondary ms-1">{{ f.file_type|upper }}</span>
+                    </span>
+                    <span>
+                        {% if f.is_processed %}
+                            <a href="{% url 'results' f.pk %}" class="btn btn-sm btn-outline-success">Нәтиже</a>
+                        {% else %}
+                            <a href="{% url 'process' f.pk %}" class="btn btn-sm btn-outline-primary">Өңдеу</a>
+                        {% endif %}
+                    </span>
+                </li>
+                {% endfor %}
+            </ul>
+        </div>
+        {% endif %}
+
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.getElementById('upload-form').addEventListener('submit', function() {
+    document.getElementById('upload-progress').classList.remove('d-none');
+    document.getElementById('submit-btn').disabled = true;
+});
+</script>
+{% endblock %}

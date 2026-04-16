@@ -1,0 +1,86 @@
+{% extends "dataprocessor/base.html" %}
+
+{% block title %}Өңдеу параметрлері — {{ file_record.original_name }}{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-7">
+
+        <div class="card shadow-sm">
+            <div class="card-header bg-success text-white">
+                <h5 class="mb-0">⚙️ Өңдеу параметрлері</h5>
+            </div>
+            <div class="card-body">
+
+                <!-- Файл ақпараты -->
+                <div class="alert alert-info">
+                    <strong>Файл:</strong> {{ file_record.original_name }}
+                    &nbsp;|&nbsp;
+                    <strong>Тип:</strong> {{ file_record.file_type|upper }}
+                    &nbsp;|&nbsp;
+                    <strong>Өлшем:</strong> {{ file_record.get_file_size_mb }} МБ
+                </div>
+
+                <!-- Өңдеу опциялары -->
+                <form method="post">
+                    {% csrf_token %}
+
+                    <p class="fw-bold">Орындалатын функцияларды таңдаңыз:</p>
+
+                    <div class="form-check mb-2">
+                        {{ options_form.show_shape }}
+                        <label class="form-check-label" for="{{ options_form.show_shape.id_for_label }}">
+                            {{ options_form.show_shape.label }}
+                        </label>
+                    </div>
+
+                    <div class="form-check mb-2">
+                        {{ options_form.show_nulls }}
+                        <label class="form-check-label" for="{{ options_form.show_nulls.id_for_label }}">
+                            {{ options_form.show_nulls.label }}
+                        </label>
+                    </div>
+
+                    <div class="form-check mb-2">
+                        {{ options_form.show_stats }}
+                        <label class="form-check-label" for="{{ options_form.show_stats.id_for_label }}">
+                            {{ options_form.show_stats.label }}
+                        </label>
+                    </div>
+
+                    <div class="form-check mb-3">
+                        {{ options_form.show_top_values }}
+                        <label class="form-check-label" for="{{ options_form.show_top_values.id_for_label }}">
+                            {{ options_form.show_top_values.label }}
+                        </label>
+                    </div>
+
+                    <div class="mb-3 d-flex align-items-center gap-2">
+                        <label class="form-label mb-0">Top-N саны:</label>
+                        {{ options_form.top_n }}
+                    </div>
+
+                    <hr>
+
+                    <button type="submit" class="btn btn-success w-100" id="process-btn">
+                        ▶ Өңдеуді іске қосу
+                    </button>
+                </form>
+
+            </div>
+        </div>
+
+        <a href="{% url 'index' %}" class="btn btn-outline-secondary mt-3">← Артқа</a>
+
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.querySelector('form').addEventListener('submit', function() {
+    document.getElementById('process-btn').disabled = true;
+    document.getElementById('process-btn').textContent = '⏳ Өңделуде...';
+});
+</script>
+{% endblock %}
